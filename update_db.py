@@ -28,14 +28,20 @@ def vaihdaAikavyohyke(aikaleima):
 
     return datetime_fi_formatted
 
-def asemanJunatiedot(lahtoAsema, kohdeAsema, aikaikkuna_ennen, aikaikkuna_jalkeen):
-    """ 
+def asemanJunatiedot(lahtoAsema, kohdeAsema, aikaikkuna_ennen,
+                     aikaikkuna_jalkeen):
+    """ Hakee parametrina annettujen lähtö- ja kohdeasemien välillä kulkevien
+        junien tiedot. Aikaikkuna-asetuksilla rajataan poimittavien junien
+        määrää. Esim. aikaikkuna ennen = kuinka monta minuuttia ennen lähtöä
+        juna näytetään. Rajapinnassa aikavälirajoituksen maksimikoko on 24
+        tuntia eli 1440 minuuttia.
+      
     """
     url = 'https://rata.digitraffic.fi/api/v1/live-trains/station/' + \
           lahtoAsema + '?minutes_before_departure=' + str(aikaikkuna_ennen) + \
           '&minutes_after_departure=' + str(aikaikkuna_jalkeen) + \
-          '&minutes_before_arrival=' + str(aikaikkuna_ennen) + \
-          '&minutes_after_arrival=' + str(aikaikkuna_jalkeen)
+          '&minutes_before_arrival=0' + \
+          '&minutes_after_arrival=0'
 
     try:
         response = urllib.request.urlopen(url)
@@ -45,7 +51,8 @@ def asemanJunatiedot(lahtoAsema, kohdeAsema, aikaikkuna_ennen, aikaikkuna_jalkee
 
         for item in data:
             if item['trainType'] in ['IC','S']:
-                if onkoOikeaReittiJaSuunta(item['timeTableRows'], lahtoAsema, kohdeAsema):
+                if onkoOikeaReittiJaSuunta(item['timeTableRows'], lahtoAsema,
+                                           kohdeAsema):
                     junaNro = item['trainNumber']
                     junaTyyppi = item['trainType']
                     junaTunnus = junaTyyppi + " " + str(junaNro)
@@ -55,8 +62,10 @@ def asemanJunatiedot(lahtoAsema, kohdeAsema, aikaikkuna_ennen, aikaikkuna_jalkee
                     junaTiedot[junaTunnus]['junaTyyppi'] = junaTyyppi
                     junaTiedot[junaTunnus]['junaAsemaKohde'] = kohdeAsema
                     junaTiedot[junaTunnus]['junaAsemaLahto'] = lahtoAsema
-                    junaTiedot[junaTunnus]['junaAjossa'] = item['runningCurrently']
-                    lahtoaika, lahtoaika_enn, lahtoaika_tod, myohassa, myohassa_min = \
+                    junaTiedot[junaTunnus]['junaAjossa'] = \
+                        item['runningCurrently']
+                    lahtoaika, lahtoaika_enn, lahtoaika_tod, myohassa, \
+                    myohassa_min = \
                         lahtoAjat(item['timeTableRows'], lahtoAsema)
                     junaTiedot[junaTunnus]['junaLahtoAika'] = lahtoaika
                     junaTiedot[junaTunnus]['junaLahtoAikaArvio'] = lahtoaika_enn
@@ -148,10 +157,12 @@ def junadataTietokantaan(request):
     """
     print("Tietojen päivitys!")
     # reitti tällä hetkellä kovakoodattuna, voisi parametrisoida
-    junaTiedot, luku_ok = asemanJunatiedot('TPE', 'HKI', 300, 1440)
+    junaTiedot, luku_ok = asemanJunatiedot('TPE', 'HKI', 300, 1140)
     print("Junatiedot len: " + str(len(junaTiedot)))
     
     if luku_ok and len(junaTiedot) > 0:
+        # viedään dictissä olevat junatiedot pandas-dataframeen, jossa
+        # niitä on mukavampi käsitellä
         df = pd.DataFrame.from_dict(junaTiedot, orient='index')
         df.index.names = ['junaTunnus']
         df.reindex()
@@ -178,8 +189,8 @@ def junadataTietokantaan(request):
         
         print("debug, inserted data:")
         print(df.loc[:,['junaAsemaLahto', 'junaAsemaKohde', 'junaLahtoAika',
-                        'junaLahtoAikaArvio', 'junaLahtoAikaTod', 'junaMyohassa',
-                        'junaMyohassaMin']])
+                        'junaLahtoAikaArvio', 'junaLahtoAikaTod',
+                        'junaMyohassa', 'junaMyohassaMin']])
 
         # tallennetaan tietojen päivityshetki tietokantaan
         login_user = request.user.username    
