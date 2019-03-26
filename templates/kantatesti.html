@@ -1,0 +1,18 @@
+<html>
+    <body>
+        <h1>Vieraskirja</h1>
+        <form method="post">
+            {% csrf_token %}
+            {{ form }}
+            <button type="submit">OK</button>
+        </form>
+        <br>
+        <b>Viimeisimmät vierailijat:</b>
+        <br><br>
+        {% for vierailija in vierailijat %}
+            {{vierailija.pvm}} {{vierailija.syote}} <br>
+        {% endfor %}
+    </body>
+    
+</html>
+

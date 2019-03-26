@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<!-- templates/home.html -->
+{% extends 'base.html' %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+{% if user.is_authenticated %}
+  Olet kirjautuneena tunnuksella {{ user.username }}
+  <p><a href="{% url 'logout' %}">Kirjaudu ulos</a></p>
+
+  {% for setting in settings %}
+  <form action= "{% url 'paivita_junadata' %}" method="POST"> 
+    {% csrf_token %}
+          &nbsp;<input type="submit" value="Päivitä tiedot" onclick="this.disabled=true; this.value='Odota hetki...';this.form.submit()" class="btn btn-primary" id="nappi1"></button> Tiedot p&auml;ivitetty {{setting.SettingValue}} 
+  </form>
+  {% endfor %}
+    
+  <br>
+  <div id="junalista"> 
+  <b>InterCity- ja Pendolino-junat välillä Tampere-Helsinki</b>
+  
+  <br>
+  
+  <table class="table table-sm table-dark">
+    <thead>
+      <tr>
+        <th scope="col">Juna</th>
+        <th scope="col">Lähtöaika</th>
+        <th scope="col">Lähtöaika arvio</th>
+        <th scope="col">Lähtöaika toteutunut</th>
+        <th scope="col">Myöhässä min</th>
+      </tr>
+    </thead>
+  <tbody>
+    
+    {% for juna in junat %}
+    <tr>
+    <th scope="row">{{juna.junaTunnus}}</th>
+    <td>{{juna.junaLahtoaika}}</td>
+    <td>{{juna.junaLahtoaikaEnnuste}}</td>
+    <td>{{juna.junaLahtoaikaTod}}</td>
+    {% if juna.junaMyohassa == "True" %}
+      <td class="bg-danger">{{juna.junaMyohassaMin}}</td>
+    {% else %}
+      <td>{{juna.junaMyohassaMin}}</td>
+    {% endif %}  
+    </tr>
+    {% endfor %}
+    
+  </tbody>
+  </table>
+  </div>
+{% else %}
+  <p>Kirjaudu sisään palveluun!</p>
+  <a href="{% url 'login' %}">Kirjaudu sisään</a>
+{% endif %}
+{% endblock %}
