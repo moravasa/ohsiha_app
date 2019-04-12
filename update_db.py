@@ -70,7 +70,8 @@ def asemanJunatiedot(lahtoAsema, kohdeAsema, aikaikkuna_ennen,
                     junaTiedot[junaTunnus]['junaLahtoAika'] = lahtoaika
                     junaTiedot[junaTunnus]['junaLahtoAikaArvio'] = lahtoaika_enn
                     junaTiedot[junaTunnus]['junaLahtoAikaTod'] = lahtoaika_tod
-                    # ei näytetä ennustetta, jos juna on jo lähtenyt =>
+                    # muutos 12.4.2019:
+                    # ei palauteta ennustetta, jos juna on oikeasti jo lähtenyt =>
                     if lahtoaika_tod != "":
                         junaTiedot[junaTunnus]['junaLahtoAikaArvio'] = ""
                     junaTiedot[junaTunnus]['junaMyohassa'] = myohassa
