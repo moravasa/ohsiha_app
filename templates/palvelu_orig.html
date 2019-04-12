@@ -6,13 +6,7 @@
 
 {% block content %}
 {% if user.is_authenticated %}
-{% load staticfiles %}
-
-<script src="https://code.highcharts.com/highcharts.js"></script>
-<script src="https://code.highcharts.com/highcharts-more.js"></script>
-<script src="https://code.highcharts.com/modules/solid-gauge.js"></script>
-
-
+    
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <a class="navbar-brand" href="">Junatiedot</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -32,28 +26,23 @@
       </ul>
     </div>
 </nav>
-
-<h5>InterCity- ja Pendolino-junat välillä Tampere-Helsinki</h5>
 <br>
+
 <div class="container">
   <div class="row">
     <div class="col">
         <article class="media">
           <div class="media-left">
             <figure class="image is-50x50">
-              <br><br>
               <img src="http://openweathermap.org/img/w/{{ saa_tre.kuvake }}.png" alt="Image">
             </figure>
           </div> 
           <div class="media content">
             <div class="content">
-              Säätilanne nyt
-              <br>
-              <br>
               <p>
                 <span class="title">{{ saa_tre.kaupunki }}</span>
                 <br>
-                <span class="subtitle">{{ saa_tre.lampotila }} °C</span>
+                <span class="subtitle">{{ saa_tre.lampotila }} </span>
                 <br> {{ saa_tre.saa_kuvaus}}
               </p>
             </div>
@@ -61,22 +50,10 @@
         </article>
       </div>
       <div class="col">
-          <div id="container-mittari1"></div>
-          {% block javascript_gauge1 %}
-          <script type="text/javascript">
-             var kpi_1 = {{ kpi_1 }};
-          </script>
-          <script src="{% static "js/gauge.js" %}"></script>
-          {% endblock javascript_gauge1 %}
+        second
       </div>
       <div class="col">
-        <div id="container-mittari2"></div>
-        {% block javascript_gauge2 %}
-        <script type="text/javascript">
-           var kpi_2 = {{ kpi_2 }};
-        </script>
-        <script src="{% static "js/gauge.js" %}"></script>
-        {% endblock javascript_gauge2 %}
+        third
       </div>
     </div>
 </div>
@@ -86,8 +63,10 @@
           &nbsp;<input type="submit" value="Päivitä tiedot" onclick="this.disabled=true; this.value='Odota hetki...';this.form.submit()" class="btn btn-primary" id="nappi1"></button> Tiedot p&auml;ivitetty {{setting.SettingValue}} 
   </form>
   {% endfor %}
-
+    
+  <br>
   <div id="junalista"> 
+  <b>InterCity- ja Pendolino-junat välillä Tampere-Helsinki</b>
   
   <br>
   
@@ -107,7 +86,7 @@
     <tr>
     <th scope="row">{{juna.junaTunnus}}</th>
     <td>{{juna.junaLahtoaika}}</td>
-    <td>{{juna.junaLahtoaikaArvio}}</td>
+    <td>{{juna.junaLahtoaikaEnnuste}}</td>
     <td>{{juna.junaLahtoaikaTod}}</td>
     {% if juna.junaMyohassa == "True" %}
       <td class="bg-danger">{{juna.junaMyohassaMin}}</td>

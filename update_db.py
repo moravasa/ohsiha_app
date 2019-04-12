@@ -70,6 +70,9 @@ def asemanJunatiedot(lahtoAsema, kohdeAsema, aikaikkuna_ennen,
                     junaTiedot[junaTunnus]['junaLahtoAika'] = lahtoaika
                     junaTiedot[junaTunnus]['junaLahtoAikaArvio'] = lahtoaika_enn
                     junaTiedot[junaTunnus]['junaLahtoAikaTod'] = lahtoaika_tod
+                    # ei näytetä ennustetta, jos juna on jo lähtenyt =>
+                    if lahtoaika_tod != "":
+                        junaTiedot[junaTunnus]['junaLahtoAikaArvio'] = ""
                     junaTiedot[junaTunnus]['junaMyohassa'] = myohassa
                     junaTiedot[junaTunnus]['junaMyohassaMin'] = myohassa_min
                     junaTiedot[junaTunnus]['junaPeruttu'] = item['cancelled']
@@ -100,7 +103,7 @@ def lahtoAjat(aikataulu, asema):
     lahtoaika_toteuma = ""
     myohassa = False
     myohassa_min = 0
-    MYOHASSA_RAJA_MIN = 2
+    MYOHASSA_RAJA_MIN = 3
 
     for rivi in aikataulu:
         if rivi['stationShortCode'] == asema:
@@ -111,6 +114,7 @@ def lahtoAjat(aikataulu, asema):
             lahtoaika_aikataulu = vaihdaAikavyohyke(rivi['scheduledTime'])
             
             if 'liveEstimateTime' in rivi.keys():
+                print("got ennuste: " + str(rivi['liveEstimateTime']))
                 lahtoaika_ennuste = vaihdaAikavyohyke(rivi['liveEstimateTime'])
             if 'actualTime' in rivi.keys():
                 lahtoaika_toteuma = vaihdaAikavyohyke(rivi['actualTime'])
